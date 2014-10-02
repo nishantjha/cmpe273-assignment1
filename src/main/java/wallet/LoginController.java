@@ -27,7 +27,7 @@ private int login_no=randomGenerator.nextInt(50000);
 Map<String, List<Map<String,Login>>> loginData = new HashMap<String, List<Map<String,Login>>>();
 
 //Add Login
-@RequestMapping(value="/users/{user_id}/weblogins", method=RequestMethod.POST)
+@RequestMapping(value="/api/v1/users/{user_id}/weblogins", method=RequestMethod.POST)
 public Login addLogin(@Valid @RequestBody Login login, @PathVariable("user_id") String user_id){
 login_no= login_no+10;
 String login_id= "l-"+Integer.toString(login_no);	
@@ -56,14 +56,14 @@ return new_login;
 }
 
 //list login
-@RequestMapping(value="/users/{user_id}/weblogins", method=RequestMethod.GET)
+@RequestMapping(value="/api/v1/users/{user_id}/weblogins", method=RequestMethod.GET)
 public List<Map<String,Login>> viewAllLogins(@PathVariable("user_id") String user_id){
 System.out.println(user_id);
 return loginData.get(user_id);
 }
 
 //delete
-@RequestMapping(value="/users/{user_id}/weblogins/{login_id}", method=RequestMethod.DELETE)
+@RequestMapping(value="/api/v1/users/{user_id}/weblogins/{login_id}", method=RequestMethod.DELETE)
 @ResponseStatus(HttpStatus.NO_CONTENT)
 public void deleteLogin(@PathVariable("user_id") String user_id, @PathVariable("login_id") String login_id){
 int flag=0;

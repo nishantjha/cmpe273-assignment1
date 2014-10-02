@@ -32,7 +32,7 @@ Map<String, List<Map<String,Card>>> cardData = new HashMap<String, List<Map<Stri
 
 
 //Add card details
-@RequestMapping(value="/users/{user_id}/idcards", method=RequestMethod.POST)
+@RequestMapping(value="/api/v1/users/{user_id}/idcards", method=RequestMethod.POST)
 public Card addCard(@Valid @RequestBody Card card, @PathVariable("user_id") String user_id){
 card_number= card_number+51;
 String card_id= "c-"+Integer.toString(card_number);	
@@ -69,14 +69,14 @@ return new_card;
 
 
 //Get list of cards
-@RequestMapping(value="/users/{user_id}/idcards", method=RequestMethod.GET)
+@RequestMapping(value="/api/v1/users/{user_id}/idcards", method=RequestMethod.GET)
 public List<Map<String,Card>> viewAllCards(@PathVariable("user_id") String user_id){
 System.out.println(user_id);
 return cardData.get(user_id);	
 }
 
 //delete card details
-@RequestMapping(value="/users/{user_id}/idcards/{card_id}", method=RequestMethod.DELETE)
+@RequestMapping(value="/api/v1/users/{user_id}/idcards/{card_id}", method=RequestMethod.DELETE)
 @ResponseStatus(HttpStatus.NO_CONTENT)
  public void deleteCard(@PathVariable("user_id") String user_id, @PathVariable("card_id") String card_id){
 //Hashmap iterator to check if map has the value or not

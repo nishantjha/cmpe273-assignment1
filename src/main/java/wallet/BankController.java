@@ -27,7 +27,7 @@ private int login_id=randomGenerator.nextInt(35000);
 Map<String, List<Map<String,Bank>>> bankData = new HashMap<String, List<Map<String,Bank>>>();
 
 //Addbank
-@RequestMapping(value="/users/{user_id}/bankaccounts", method=RequestMethod.POST)
+@RequestMapping(value="/api/v1/users/{user_id}/bankaccounts", method=RequestMethod.POST)
 public Bank addbank(@Valid @RequestBody Bank bank, @PathVariable("user_id") String user_id){
 login_id= login_id+11;
 String bank_id= "b-"+Integer.toString(login_id);
@@ -56,14 +56,14 @@ return new_bank;
 }
 
 //list bank
-@RequestMapping(value="/users/{user_id}/bankaccounts", method=RequestMethod.GET)
+@RequestMapping(value="/api/v1/users/{user_id}/bankaccounts", method=RequestMethod.GET)
 public List<Map<String,Bank>> viewAllBanks(@PathVariable("user_id") String user_id){
 System.out.println(user_id);
 return bankData.get(user_id);
 }
 
 //Delete a bank login
-@RequestMapping(value="/users/{user_id}/bankaccounts/{bank_id}", method=RequestMethod.DELETE)
+@RequestMapping(value="/api/v1/users/{user_id}/bankaccounts/{bank_id}", method=RequestMethod.DELETE)
 @ResponseStatus(HttpStatus.NO_CONTENT)
 public void deleteBank(@PathVariable("user_id") String user_id, @PathVariable("bank_id") String bank_id){
 int flag=0;

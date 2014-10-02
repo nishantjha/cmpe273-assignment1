@@ -30,7 +30,7 @@ private int id_no=randomGenerator.nextInt(1000);
 Map<String, User> userData = new HashMap<String, User>();
 
 //Add User
-@RequestMapping(value="/", method=RequestMethod.POST)
+@RequestMapping(value="/api/v1/users", method=RequestMethod.POST)
 public User update(@Valid @RequestBody User user){
 id_no= id_no+17;
 String user_id= "u-"+Integer.toString(id_no);	
@@ -44,14 +44,14 @@ return new_user;
 }
 
 //Get User details
-@RequestMapping(value="/users/{user_id}",method=RequestMethod.GET)
+@RequestMapping(value="/api/v1/users/{user_id}",method=RequestMethod.GET)
 public User view(@PathVariable("user_id") String user_id){
 System.out.println(user_id);
 return userData.get(user_id);
 }
 
 //Update User Details
-@RequestMapping(value="/users/{user_id}",method=RequestMethod.PUT)
+@RequestMapping(value="/api/v1/users/{user_id}",method=RequestMethod.PUT)
 public User edit(@Valid @RequestBody User user,@PathVariable("user_id") String user_id){
 System.out.println(user_id);
 User user_online= userData.get(user_id);
