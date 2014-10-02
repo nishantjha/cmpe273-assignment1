@@ -1,0 +1,244 @@
+package wallet;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
+import java.lang.Math;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+@RestController
+public class UserController {
+private String ig_gen;
+private long id_no=1000;
+private long card_no=11000;
+private long web_login_id=21000;
+private long bank_login_id=31000;
+
+Map<String, User> userData = new HashMap<String, User>();
+Map<String, List<Map<String,Card>>> cardData = new HashMap<String, List<Map<String,Card>>>();
+Map<String, List<Map<String,Login>>> loginData = new HashMap<String, List<Map<String,Login>>>();
+Map<String, List<Map<String,Bank>>> bankData = new HashMap<String, List<Map<String,Bank>>>();
+//Add User
+@RequestMapping(value="/", method=RequestMethod.POST)
+public User update(@RequestBody User user){
+id_no= id_no+101;
+String user_id= "u"+Long.toString(id_no);	
+Date date = new Date();
+SimpleDateFormat df= new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+String created_at= df.format(date);
+String updated_at= df.format(date);
+User new_user=new User(user_id, user.getEmail(), user.getPassword(), user.getName(), created_at, updated_at);
+userData.put(user_id,new_user);
+return new_user;
+}
+//Get User details
+@RequestMapping(value="/users/{user_id}",method=RequestMethod.GET)
+public User view(@PathVariable("user_id") String user_id){
+System.out.println(user_id);
+return userData.get(user_id);
+}	
+	
+//Update User Details
+@RequestMapping(value="/users/{user_id}",method=RequestMethod.PUT)
+public User edit(@RequestBody User user,@PathVariable("user_id") String user_id){
+System.out.println(user_id);
+User user_online= userData.get(user_id);
+user_online.setEmail(user.getEmail());
+user_online.setPassword(user.getPassword());
+Date date = new Date();
+SimpleDateFormat f= new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+String updated_at= f.format(date);
+user_online.setUpdated_at(updated_at);
+userData.put(user_id, user_online);
+return userData.get(user_id);
+}
+
+//Add card details
+@RequestMapping(value="/users/{user_id}/idcards", method=RequestMethod.POST)
+public Card addCard(@RequestBody Card card, @PathVariable("user_id") String user_id){
+card_no= card_no+501;
+String card_id= "c"+Long.toString(card_no);	
+/*Calendar date = Calendar.getInstance();
+Date date = new Date();
+date.add(Calendar.YEAR,1);
+SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+String expiration_date=df.format(date);
+*/
+Card new_card=new Card(card_id, card.getCard_no(), card.getCard_name(), card.getExpiration_date());
+//Map Iterator to check if the HashMap has value or not and add card details
+int flag=0;
+Iterator itr = cardData.entrySet().iterator();
+while (itr.hasNext()) {
+Map.Entry pairs = (Map.Entry)itr.next();
+if(pairs.getKey().equals(user_id)){
+List<Map<String, Card>> list=(List<Map<String, Card>>)cardData.get(user_id);
+Map<String, Card> map_new_card= new HashMap<String, Card>();
+map_new_card.put(card_id, new_card);
+list.add(map_new_card);
+flag=1;
+break;
+}}
+if(flag==0){
+List<Map<String, Card>> list1= new ArrayList<Map<String,Card>>();
+Map<String, Card> map_new_card= new HashMap<String, Card>();
+map_new_card.put(card_id, new_card);
+list1.add(map_new_card);
+cardData.put(user_id,list1);
+}
+return new_card;
+}
+
+
+//Get list of cards
+@RequestMapping(value="/users/{user_id}/idcards", method=RequestMethod.GET)
+public List<Map<String,Card>> viewAllCards(@PathVariable("user_id") String user_id){
+System.out.println(user_id);
+return cardData.get(user_id);	
+}
+
+//delete card details
+@RequestMapping(value="/users/{user_id}/idcards/{card_id}", method=RequestMethod.DELETE)
+@ResponseStatus(HttpStatus.NO_CONTENT)
+ public void deleteCard(@PathVariable("user_id") String user_id, @PathVariable("card_id") String card_id){
+//Hashmap iterator to check if map has the value or not
+int flag=0;
+Iterator itr = cardData.entrySet().iterator();
+while (itr.hasNext()) {
+Map.Entry pairs = (Map.Entry)itr.next();
+if(pairs.getKey().equals(user_id)){
+List<Map<String, Card>> temp=(List<Map<String, Card>>)cardData.get(user_id);
+Iterator itr_list = temp.listIterator();
+while (itr_list.hasNext()) {
+if(((Map<String,Card>)itr_list.next()).containsKey(card_id)){
+itr_list.remove();
+}}
+break;
+}}}
+
+//Add Login
+@RequestMapping(value="/users/{user_id}/weblogins", method=RequestMethod.POST)
+public Login addLogin(@RequestBody Login login, @PathVariable("user_id") String user_id){
+web_login_id= web_login_id+100;
+String login_id= "l"+Long.toString(web_login_id);	
+/*Calendar date = Calendar.getInstance();
+Date date = new Date();
+date.add(Calendar.YEAR,1);
+DateFormat df = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+String expiration_date=df.format(date);
+*/Login new_login=new Login(login_id, login.getUrl(), login.getLogin(), login.getPassword());
+int flag=0;
+Iterator itr = loginData.entrySet().iterator();
+while (itr.hasNext()) {
+Map.Entry pairs = (Map.Entry)itr.next();
+if(pairs.getKey().equals(user_id)){
+List<Map<String, Login>> l=(List<Map<String,Login>>)loginData.get(user_id);
+Map<String, Login> map_new_login= new HashMap<String, Login>();
+map_new_login.put(login_id, new_login);
+l.add(map_new_login);
+flag=1;
+break;
+}}
+
+if(flag==0){
+List<Map<String,Login>> list= new ArrayList<Map<String,Login>>();
+Map<String, Login> map_new_login= new HashMap<String, Login>();
+map_new_login.put(login_id, new_login);
+list.add(map_new_login);
+loginData.put(user_id,list);
+}
+return new_login;
+}
+
+//list login
+@RequestMapping(value="/users/{user_id}/weblogins", method=RequestMethod.GET)
+public List<Map<String,Login>> viewAllLogins(@PathVariable("user_id") String user_id){
+System.out.println(user_id);
+return loginData.get(user_id);
+}
+//delete
+@RequestMapping(value="/users/{user_id}/weblogins/{login_id}", method=RequestMethod.DELETE)
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public void deleteLogin(@PathVariable("user_id") String user_id, @PathVariable("login_id") String login_id){
+int flag=0;
+Iterator itr = loginData.entrySet().iterator();
+while (itr.hasNext()) {
+Map.Entry pairs = (Map.Entry)itr.next();
+if(pairs.getKey().equals(user_id)){
+List<Map<String,Login>> list=(List<Map<String,Login>>)loginData.get(user_id);
+Iterator itrl = list.listIterator();
+while (itrl.hasNext()) {
+if(((Map<String,Login>)itrl.next()).containsKey(login_id)){
+itrl.remove();}}break;}}}
+
+//Addbank
+@RequestMapping(value="/users/{user_id}/bankaccounts", method=RequestMethod.POST)
+public Bank addbank(@RequestBody Bank bank, @PathVariable("user_id") String user_id){
+bank_login_id= bank_login_id+1;
+String bank_id= "b"+Long.toString(bank_login_id);
+/*Calendar date = Calendar.getInstance();
+Date date = new Date();
+date.add(Calendar.YEAR,1);
+SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+String expiration_date=df.format(date);
+*/Bank new_bank=new Bank(bank_id, bank.getAccount_name(), bank.getRouting_number(), bank.getAccount_number());
+int flag=0;
+Iterator itr = bankData.entrySet().iterator();
+while (itr.hasNext()) {
+Map.Entry pairs = (Map.Entry)itr.next();
+if(pairs.getKey().equals(user_id)){
+List<Map<String, Bank>> temp=(List<Map<String,Bank>>)bankData.get(user_id);
+Map<String, Bank> map_new_bank= new HashMap<String, Bank>();
+map_new_bank.put(bank_id, new_bank);
+temp.add(map_new_bank);
+flag=1;
+break;
+}}
+
+if(flag==0){
+List<Map<String,Bank>> list= new ArrayList<Map<String,Bank>>();
+Map<String, Bank> map_new_bank= new HashMap<String, Bank>();
+map_new_bank.put(bank_id, new_bank);
+list.add(map_new_bank);
+bankData.put(user_id,list);
+}
+return new_bank;
+}
+
+//list bank
+@RequestMapping(value="/users/{user_id}/bankaccounts", method=RequestMethod.GET)
+public List<Map<String,Bank>> viewAllBanks(@PathVariable("user_id") String user_id){
+System.out.println(user_id);
+return bankData.get(user_id);
+}
+//Delete a bank login
+@RequestMapping(value="/users/{user_id}/bankaccounts/{bank_id}", method=RequestMethod.DELETE)
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public void deleteBank(@PathVariable("user_id") String user_id, @PathVariable("bank_id") String bank_id){
+int flag=0;
+Iterator itr = bankData.entrySet().iterator();
+while (itr.hasNext()) {
+Map.Entry pairs = (Map.Entry)itr.next();
+if(pairs.getKey().equals(user_id)){
+List<Map<String,Bank>> list=(List<Map<String,Bank>>)bankData.get(user_id);
+Iterator itrlist = list.listIterator();
+while (itrlist.hasNext()) {
+if(((Map<String,Bank>)itrlist.next()).containsKey(bank_id)){
+itrlist.remove();
+}}break;}}}
+
+
+}
